@@ -28,7 +28,7 @@ yt-dlp -f bestaudio --extract-audio --audio-format mp3 "<youtube_video_url"
 whisper "<audio_filename>" --model base
 ```
 
-# Script to Process All videos
+## Script to Process Youtube Videos
 
 ```
 #!/bin/bash
