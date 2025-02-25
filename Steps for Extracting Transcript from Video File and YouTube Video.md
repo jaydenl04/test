@@ -78,3 +78,50 @@ echo "Processing completed. Check $OUTPUT_DIR for results."
 ## create videos.txt file
 
 create a file called `videos.txt` that contains all youtube video links
+
+# MP4 Files
+
+```bash
+#!/bin/bash
+
+# Folder to save audio and transcriptions
+OUTPUT_DIR="./output"
+mkdir -p "$OUTPUT_DIR"
+
+# Folder containing MP4 files
+VIDEO_DIR="./videos"  # Change this to the folder where your MP4 files are stored
+
+# Loop through each MP4 file in the folder
+for VIDEO_FILE in "$VIDEO_DIR"/*.mp4; do
+  echo "Processing $VIDEO_FILE..."
+
+  # Extract the base filename without extension
+  VIDEO_TITLE=$(basename "$VIDEO_FILE" .mp4)
+
+  # Define filenames for MP3 and transcription
+  MP3_FILE="$OUTPUT_DIR/${VIDEO_TITLE}.mp3"
+  TXT_FILE="$OUTPUT_DIR/${VIDEO_TITLE}.txt"
+
+  # Check if the MP3 file already exists
+  if [ -f "$MP3_FILE" ]; then
+    echo "MP3 file already exists: $MP3_FILE. Skipping extraction."
+  else
+    echo "Extracting audio from $VIDEO_FILE..."
+    ffmpeg -i "$VIDEO_FILE" -q:a 0 -map a "$MP3_FILE"
+  fi
+
+  # Check if the transcription already exists
+  if [ -f "$TXT_FILE" ]; then
+    echo "Transcript already exists: $TXT_FILE. Skipping transcription."
+  else
+    if [ -f "$MP3_FILE" ]; then
+      echo "Transcribing $MP3_FILE with Whisper..."
+      whisper "$MP3_FILE" --model base --output_dir "$OUTPUT_DIR"
+    else
+      echo "Error: MP3 file $MP3_FILE does not exist. Skipping transcription."
+    fi
+  fi
+done
+
+echo "Processing completed. Check $OUTPUT_DIR for results."
+```
